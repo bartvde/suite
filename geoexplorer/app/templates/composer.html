@@ -2,83 +2,362 @@
     <link rel="stylesheet" type="text/css" href="../theme/app/geoexplorer.css" />
     <!--[if IE]><link rel="stylesheet" type="text/css" href="../theme/app/ie.css"/><![endif]-->        
     <link rel="stylesheet" type="text/css" href="../theme/ux/colorpicker/color-picker.ux.css" />
-    <script type="text/javascript" src="../script/GeoExplorer.js"></script>
 
-    <!-- PrintPreview resources -->
-    <link rel="stylesheet" type="text/css" href="../externals/printpreview/resources/css/printpreview.css">
+    <script type="text/javascript" src="../script/GeoExplorer.js"></script>
+    <script>
+        Ext.Loader.setConfig({
+            enabled: true,
+            disableCaching: false,
+            paths: {
+                gxp: "../externals/gxp2/src/gxp",
+                GeoExt: "../externals/geoext2/src/GeoExt",
+                Ext: "http://cdn.sencha.com/ext/gpl/4.2.1/src"
+            }
+        });
+
+        Ext.require([
+            'Ext.container.Viewport',
+            'GeoExt.slider.Tip',
+            'GeoExt.slider.Zoom',
+            'GeoExt.Lang',
+            'gxp.Viewer',
+            'gxp.plugins.OLSource',
+            'gxp.plugins.WMSSource',
+            'gxp.plugins.WMSCSource',
+            'gxp.plugins.WMSGetFeatureInfo',
+            'gxp.plugins.RemoveLayer',
+            'gxp.plugins.LayerTree',
+            'gxp.plugins.ZoomToExtent',
+            'gxp.plugins.ZoomToLayerExtent',
+            'gxp.plugins.Navigation',
+            'gxp.plugins.NavigationHistory',
+            'gxp.plugins.Zoom',
+            'gxp.plugins.Measure',
+            'gxp.plugins.AddLayers',
+            'gxp.plugins.MapQuestSource',
+            'gxp.plugins.BingSource',
+            'gxp.plugins.GoogleSource',
+            'gxp.plugins.OSMSource',
+            'gxp.plugins.MapBoxSource',
+            'gxp.plugins.FeatureManager',
+            'gxp.plugins.QueryForm',
+            'gxp.plugins.FeatureGrid',
+            'gxp.plugins.LayerProperties',
+            'gxp.panel.ScaleOverlay',
+            'gxp.container.WMSStylesDialog',
+            'gxp.plugins.CSWCatalogueSource',
+            'gxp.tab.CrumbPanel'
+        ]);
+
+        Ext.define('GeoExplorer.Composer', {
+            extend: 'gxp.Viewer',
+            constructor: function(config) {
+                this.mapItems = [{
+                    xtype: "gxp_scaleoverlay"
+                }, {
+                    xtype: "gx_zoomslider",
+                    vertical: true,
+                    height: 100,
+                    plugins: Ext.create('GeoExt.slider.Tip', {
+                        getText: function(thumb) {
+                             return Ext.String.format(
+                                 '<div>Zoom Level: {0}</div><div>Scale: 1:{1}</div>',
+                                 thumb.slider.getZoom(),
+                                 thumb.slider.getScale()
+                             );
+                        }
+                    })
+                }];
+                config.tools = [{
+                    ptype: "gxp_layertree", /* TODO restore to layermanager */
+                    outputConfig: {
+                        id: "layers",
+                        tbar: [],
+                        autoScroll: true
+                    },
+                    outputTarget: "tree"
+                }, {
+                    ptype: "gxp_addlayers",
+                    actionTarget: "layers.tbar",
+                    outputTarget: "tree",
+                    uploadSource: "local",
+                    postUploadAction: {
+                        plugin: "styler"
+                    },
+                    catalogSourceKey: "local",
+                    search: {
+                        selectedSource: "csw"
+                    }
+                }, {
+                    ptype: "gxp_removelayer",
+                    actionTarget: ["layers.tbar", "layers.contextMenu"]
+                }, {
+                    ptype: "gxp_layerproperties",
+                    id: "layerproperties",
+                    outputConfig: {defaults: {autoScroll: true}, width: 320},
+                    actionTarget: ["layers.tbar", "layers.contextMenu"],
+                    outputTarget: "tree"
+                }/*, {
+                    ptype: "gxp_styler",
+                    id: "styler",
+                    outputConfig: {autoScroll: true, width: 320},
+                    actionTarget: ["layers.tbar", "layers.contextMenu"],
+                    outputTarget: "tree"
+                }*/, {
+                    ptype: "gxp_zoomtolayerextent",
+                    actionTarget: {target: "layers.contextMenu", index: 0}
+                }/*, {
+                    ptype: "gxp_googleearth",
+                    actionTarget: ["map.tbar", "globe.tbar"]
+                }*/, {
+                    ptype: "gxp_navigation", toggleGroup: "navigation"
+                }, {
+                    ptype: "gxp_zoom", toggleGroup: "navigation",
+                    showZoomBoxAction: true,
+                    controlOptions: {zoomOnClick: false}
+                }, {
+                    ptype: "gxp_navigationhistory"
+                }, {
+                    ptype: "gxp_zoomtoextent"
+                }, {
+                    actions: ["aboutbutton"],  actionTarget: "paneltbar"
+                }, {
+                    actions: ["-"], actionTarget: "paneltbar"
+                }, {
+                    actions: ["mapmenu"],  actionTarget: "paneltbar"
+                }/*, {
+                    ptype: "gxp_print",
+                    customParams: {outputFilename: 'GeoExplorer-print'},
+                    printService: config.printService,
+                    actionTarget: "paneltbar",
+                    showButtonText: true
+                }*/, {
+                    actions: ["-"],
+                    actionTarget: "paneltbar"
+                }, {
+                    ptype: "gxp_wmsgetfeatureinfo", format: 'grid',
+                    toggleGroup: "interaction",
+                    showButtonText: true,
+                    actionTarget: "paneltbar"
+                }, {
+                    ptype: "gxp_featuremanager",
+                    id: "querymanager",
+                    selectStyle: {cursor: ''},
+                    autoLoadFeatures: true,
+                    maxFeatures: 50,
+                    paging: true,
+                    pagingType: gxp.plugins.FeatureManager.WFS_PAGING
+                }, {
+                    ptype: "gxp_queryform",
+                    featureManager: "querymanager",
+                    autoExpand: "query",
+                    actionTarget: "paneltbar",
+                    outputTarget: "query"
+                }, {
+                    ptype: "gxp_featuregrid",
+                    featureManager: "querymanager",
+                    showTotalResults: true,
+                    autoLoadFeature: false,
+                    alwaysDisplayOnMap: true,
+                    controlOptions: {multiple: true},
+                    displayMode: "selected",
+                    outputTarget: "table",
+                    outputConfig: {
+                        id: "featuregrid",
+                        columnsSortable: false
+                    }
+                }/*, {
+                    ptype: "gxp_zoomtoselectedfeatures",
+                    featureManager: "querymanager",
+                    actionTarget: ["featuregrid.contextMenu", "featuregrid.bbar"]
+                }*/, {
+                    ptype: "gxp_measure", toggleGroup: "interaction",
+                    controlOptions: {immediate: true},
+                    showButtonText: true,
+                    actionTarget: "paneltbar"
+                }, {
+                    ptype: "gxp_featuremanager",
+                    id: "featuremanager",
+                    maxFeatures: 20,
+                    paging: false
+                }/*, {
+                    ptype: "gxp_featureeditor",
+                    featureManager: "featuremanager",
+                    autoLoadFeature: true,
+                    splitButton: true,
+                    showButtonText: true,
+                    toggleGroup: "interaction",
+                    actionTarget: "paneltbar"
+                }*/, {
+                    actions: ["->"],
+                    actionTarget: "paneltbar"
+                }, {
+                    actions: ["loginbutton"],
+                    actionTarget: "paneltbar"
+                }];
+                this.callParent(arguments);
+            },
+            createTools: function() {
+                new Ext.Button({
+                    id: "aboutbutton",
+                    text: this.appInfoText,
+                    iconCls: "icon-geoexplorer",
+                    handler: this.displayAppInfo,
+                    scope: this
+                });
+            },
+            initPortal: function() {
+                var westPanel = Ext.create('gxp.tab.CrumbPanel', {
+                    id: "tree",
+                    region: "west",
+                    width: 320,
+                    split: true,
+                    collapsible: true,
+                    collapseMode: "mini",
+                    hideCollapseTool: true,
+                    header: false
+                });
+                var southPanel = Ext.create('Ext.Panel', {
+                    region: "south",
+                    id: "south",
+                    height: 220,
+                    border: false,
+                    split: true,
+                    collapsible: true,
+                    collapseMode: "mini",
+                    collapsed: true,
+                    hideCollapseTool: true,
+                    header: false,
+                    layout: "border",
+                    items: [{
+                        region: "center",
+                        id: "table",
+                        title: this.tableText,
+                        layout: "fit"
+                    }, {
+                        region: "west",
+                        width: 320,
+                        id: "query",
+                        title: this.queryText,
+                        split: true,
+                        collapsible: true,
+                        collapseMode: "mini",
+                        collapsed: true,
+                        hideCollapseTool: true,
+                        layout: "fit"
+                    }]
+                });
+                var toolbar = Ext.create('Ext.Toolbar', {
+                    disabled: false,
+                    id: 'paneltbar',
+                    items: []
+                });
+                this.mapPanelContainer = Ext.create('Ext.Panel', {
+                    layout: "card",
+                    region: "center",
+                    defaults: {
+                        border: false
+                    },
+                    items: [
+                        this.mapPanel
+                    ],
+                    activeItem: 0
+                });
+
+                this.portalItems = [{
+                    region: "center",
+                    layout: "border",
+                    tbar: toolbar,
+                    items: [
+                        this.mapPanelContainer,
+                        westPanel,
+                        southPanel
+                    ]
+                }];
+                this.callParent(arguments);
+            }
+
+        });
+
+    </script>
 
     <script>
-        Ext.BLANK_IMAGE_URL = "../theme/app/img/blank.gif";
-        OpenLayers.ImgPath = "../theme/app/img/";
-        // optionally set locale based on query string parameter
-        if (GeoExt.Lang) {
-            GeoExt.Lang.set(OpenLayers.Util.getParameters()["locale"] || GeoExt.Lang.locale);
-        }
-        var app = new GeoExplorer.Composer({
-            authStatus: {{status}},
-            proxy: "../proxy/?url=",
-            printService: "/geoserver/pdf/",
-            about: {
-                title: "GeoExplorer Demo Map",
-                "abstract": "This is a demonstration of GeoExplorer, an " +
-                    "application for assembling and publishing web-based maps. " +
-                    "After adding layers to the map, use the 'Publish map' " +
-                    "tool to embed this map in any web page.",
-                contact: "For more information, contact <a href='http://boundlessgeo.com'>Boundless</a>."
-            },
-            defaultSourceType: "gxp_wmscsource",
-            sources: {
-                local: {
-                    url: "/geoserver/ows",
-                    title: "Local GeoServer",
-                    ptype: "gxp_wmscsource"
-                },
-                csw: {
-                    url: "/geoserver/csw",
-                    ptype: "gxp_cataloguesource",
-                    yx: {'urn:x-ogc:def:crs:EPSG:6.11:4326': true}
-                },
-                suite: {
-                    url: "http://v2.suite.opengeo.org/geoserver/ows",
-                    title: "Remote Suite GeoServer"
-                },
-                mapquest: {
-                    ptype: "gxp_mapquestsource"
-                },
-                osm: {
-                    ptype: "gxp_osmsource"
-                },
-                google: {
-                    ptype: "gxp_googlesource"
-                },
-                bing: {
-                    ptype: "gxp_bingsource"
-                },
-                mapbox: {
-                    ptype: "gxp_mapboxsource"
-                },
-                ol: {
-                    ptype: "gxp_olsource"
+        Ext.application({
+            name: 'Viewer',
+            launch: function() {
+                Ext.BLANK_IMAGE_URL = "../theme/app/img/blank.gif";
+                OpenLayers.ImgPath = "../theme/app/img/";
+                // optionally set locale based on query string parameter
+                if (GeoExt.Lang) {
+                    GeoExt.Lang.set(OpenLayers.Util.getParameters()["locale"] || GeoExt.Lang.locale);
                 }
-            },
-            map: {
-                projection: "EPSG:102113",
-                layers: [{
-                    source: "mapquest",
-                    title: "MapQuest OpenStreetMap",
-                    name: "osm",
-                    group: "background"
-                }, {
-                    source: "ol",
-                    group: "background",
-                    fixed: true,
-                    type: "OpenLayers.Layer",
-                    args: [
-                        "None", {visibility: false}
-                    ]
-                }],
-                center: [0, 0],
-                zoom: 2
+                Ext.create(GeoExplorer.Composer, {
+                    authStatus: {{status}},
+                    proxy: "../proxy/?url=",
+                    printService: "/geoserver/pdf/",
+                    about: {
+                        title: "GeoExplorer Demo Map",
+                        "abstract": "This is a demonstration of GeoExplorer, an " +
+                            "application for assembling and publishing web-based maps. " +
+                            "After adding layers to the map, use the 'Publish map' " +
+                            "tool to embed this map in any web page.",
+                        contact: "For more information, contact <a href='http://boundlessgeo.com'>Boundless</a>."
+                    },
+                    defaultSourceType: "gxp_wmscsource",
+                    sources: {
+                        local: {
+                            url: "/geoserver/ows",
+                            title: "Local GeoServer",
+                            ptype: "gxp_wmscsource"
+                        },
+                        csw: {
+                            url: "/geoserver/csw",
+                            ptype: "gxp_cataloguesource",
+                            yx: {'urn:x-ogc:def:crs:EPSG:6.11:4326': true}
+                        },
+                        suite: {
+                            url: "http://v2.suite.opengeo.org/geoserver/ows",
+                            title: "Remote Suite GeoServer"
+                        },
+                        mapquest: {
+                            ptype: "gxp_mapquestsource"
+                        },
+                        osm: {
+                            ptype: "gxp_osmsource"
+                        },
+                        google: {
+                            ptype: "gxp_googlesource"
+                        },
+                        bing: {
+                            ptype: "gxp_bingsource"
+                        },
+                        mapbox: {
+                            ptype: "gxp_mapboxsource"
+                        },
+                        ol: {
+                            ptype: "gxp_olsource"
+                        }
+                    },
+                    map: {
+                        projection: "EPSG:102113",
+                        layers: [{
+                            source: "mapquest",
+                            title: "MapQuest OpenStreetMap",
+                            name: "osm",
+                            group: "background"
+                        }, {
+                            source: "ol",
+                            group: "background",
+                            fixed: true,
+                            type: "OpenLayers.Layer",
+                            args: [
+                                "None", {visibility: false}
+                            ]
+                        }],
+                        center: [0, 0],
+                        zoom: 2
+                    }
+                });
             }
         });
     </script>

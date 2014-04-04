@@ -4,43 +4,6 @@
 
 Ext.USE_NATIVE_JSON = true;
 
-// http://www.sencha.com/forum/showthread.php?141254-Ext.Slider-not-working-properly-in-IE9
-// TODO re-evaluate once we move to Ext 4
-Ext.override(Ext.dd.DragTracker, {
-    onMouseMove: function (e, target) {
-        if (this.active && Ext.isIE && !Ext.isIE9 && !e.browserEvent.button) {
-            e.preventDefault();
-            this.onMouseUp(e);
-            return;
-        }
-        e.preventDefault();
-        var xy = e.getXY(), s = this.startXY;
-        this.lastXY = xy;
-        if (!this.active) {
-            if (Math.abs(s[0] - xy[0]) > this.tolerance || Math.abs(s[1] - xy[1]) > this.tolerance) {
-                this.triggerStart(e);
-            } else {
-                return;
-            }
-        }
-        this.fireEvent('mousemove', this, e);
-        this.onDrag(e);
-        this.fireEvent('drag', this, e);
-    }
-});
-
-(function() {
-    // backwards compatibility for reading saved maps
-    // these source plugins were renamed after 2.3.2
-    Ext.preg("gx_wmssource", gxp.plugins.WMSSource);
-    Ext.preg("gx_olsource", gxp.plugins.OLSource);
-    Ext.preg("gx_googlesource", gxp.plugins.GoogleSource);
-    Ext.preg("gx_bingsource", gxp.plugins.BingSource);
-    Ext.preg("gx_osmsource", gxp.plugins.OSMSource);
-    // use layermanager instead of layertree
-    Ext.preg("gxp_layertree", gxp.plugins.LayerManager);
-})();
-
 /**
  * api: (define)
  * module = GeoExplorer

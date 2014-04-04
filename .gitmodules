@@ -37,3 +37,9 @@
 [submodule "geoserver/data_dir/externals/suite-data"]
 	path = geoserver/data_dir/externals/suite-data
 	url = https://github.com/boundlessgeo/suite-data.git
+[submodule "geoexplorer/app/static/externals/gxp2"]
+	path = geoexplorer/app/static/externals/gxp2
+	url = https://github.com/bartvde/gxp2.git
+[submodule "geoexplorer/app/static/externals/geoext2"]
+	path = geoexplorer/app/static/externals/geoext2
+	url = https://github.com/geoext/geoext2.git
