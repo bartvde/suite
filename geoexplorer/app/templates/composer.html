@@ -51,6 +51,38 @@
 
         Ext.define('GeoExplorer.Composer', {
             extend: 'gxp.Viewer',
+            zoomSliderText: "<div>Zoom Level: {zoom}</div><div>Scale: 1:{scale}</div>",
+            loadConfigErrorText: "Trouble reading saved configuration: <br />",
+            loadConfigErrorDefaultText: "Server Error.",
+            xhrTroubleText: "Communication Trouble: Status ",
+            layersText: "Layers",
+            titleText: "Title",
+            bookmarkText: "Bookmark URL",
+            permakinkText: 'Permalink',
+            appInfoText: "GeoExplorer",
+            aboutText: "About GeoExplorer",
+            mapInfoText: "Map Info",
+            descriptionText: "Description",
+            contactText: "Contact",
+            aboutThisMapText: "About this Map",
+            aboutUrl: "../about.html",
+            // from composer
+            mapText: "Map",
+            saveMapText: "Save map",
+            exportMapText: "Export map",
+            toolsTitle: "Choose tools to include in the toolbar:",
+            previewText: "Preview",
+            backText: "Back",
+            nextText: "Next",
+            loginText: "Login",
+            logoutText: "Logout, {user}",
+            loginErrorText: "Invalid username or password.",
+            userFieldText: "User",
+            passwordFieldText: "Password",
+            tableText: "Table",
+            queryText: "Query",
+            logoutConfirmTitle: "Warning",
+            logoutConfirmMessage: "Logging out will undo any unsaved changes, remove any layers you may have added, and reset the map composition. Do you want to save your composition first?",
             constructor: function(config) {
                 this.mapItems = [{
                     xtype: "gxp_scaleoverlay"
@@ -73,7 +105,7 @@
                     outputConfig: {
                         id: "layers",
                         tbar: [],
-                        title: 'Layers',
+                        title: this.layersText,
                         autoScroll: true
                     },
                     outputTarget: "tree"
@@ -121,11 +153,42 @@
                 }, {
                     ptype: "gxp_zoomtoextent"
                 }, {
-                    actions: ["aboutbutton"],  actionTarget: "paneltbar"
+                    actions: [{
+                        id: "aboutbutton",
+                        text: this.appInfoText,
+                        iconCls: "icon-geoexplorer",
+                        handler: this.displayAppInfo,
+                        scope: this
+                    }], showButtonText: true, actionTarget: "paneltbar"
                 }, {
                     actions: ["-"], actionTarget: "paneltbar"
                 }, {
-                    actions: ["mapmenu"],  actionTarget: "paneltbar"
+                    actions: [{
+                        id: "mapmenu",
+                        text: this.mapText,
+                        iconCls: 'icon-map',
+                        menu: new Ext.menu.Menu({
+                            items: [{
+                                text: this.exportMapText,
+                                handler: function() {
+                                    this.doAuthorized(["ROLE_ADMINISTRATOR"], function() {
+                                        this.save(this.showEmbedWindow);
+                                    }, this);
+                                },
+                                scope: this,
+                                iconCls: 'icon-export'
+                            }, {
+                                text: this.saveMapText,
+                                    handler: function() {
+                                        this.doAuthorized(["ROLE_ADMINISTRATOR"], function() {
+                                            this.save(this.showUrl);
+                                        }, this);
+                                    },
+                                    scope: this,
+                                    iconCls: "icon-save"
+                            }]
+                        })
+                    }],  showButtonText: true, actionTarget: "paneltbar"
                 }/*, {
                     ptype: "gxp_print",
                     customParams: {outputFilename: 'GeoExplorer-print'},
@@ -150,6 +213,7 @@
                     pagingType: gxp.plugins.FeatureManager.WFS_PAGING
                 }, {
                     ptype: "gxp_queryform",
+                    showButtonText: true,
                     featureManager: "querymanager",
                     autoExpand: "query",
                     actionTarget: "paneltbar",
@@ -198,14 +262,42 @@
                 }];
                 this.callParent(arguments);
             },
-            createTools: function() {
-                new Ext.Button({
-                    id: "aboutbutton",
-                    text: this.appInfoText,
-                    iconCls: "icon-geoexplorer",
-                    handler: this.displayAppInfo,
-                    scope: this
+            displayAppInfo: function() {
+                var appInfo = Ext.create('Ext.Panel', {
+                    title: this.appInfoText,
+                    html: "<iframe style='border: none; height: 100%; width: 100%' src='" + this.aboutUrl + "' frameborder='0' border='0'><a target='_blank' href='" + this.aboutUrl + "'>"+this.aboutText+"</a> </iframe>"
                 });
+
+                var about = Ext.applyIf(this.about, {
+                    title: '',
+                    "abstract": '',
+                    contact: ''
+                });
+
+                var mapInfo = Ext.create('Ext.Panel', {
+                    title: this.mapInfoText,
+                    html: '<div class="gx-info-panel">' +
+                        '<h2>'+this.titleText+'</h2><p>' + about.title +
+                        '</p><h2>'+this.descriptionText+'</h2><p>' + about['abstract'] +
+                        '</p> <h2>'+this.contactText+'</h2><p>' + about.contact +'</p></div>',
+                    height: 'auto',
+                    width: 'auto'
+                });
+
+                var tabs = Ext.create('Ext.TabPanel', {
+                    activeTab: 0,
+                    items: [mapInfo, appInfo]
+                });
+
+                var win = Ext.create('Ext.Window', {
+                    title: this.aboutThisMapText,
+                    modal: true,
+                    layout: "fit",
+                    width: 300,
+                    height: 300,
+                    items: [tabs]
+                });
+                win.show();
             },
             initPortal: function() {
                 var westPanel = Ext.create('gxp.tab.CrumbPanel', {
@@ -293,6 +385,8 @@
                     GeoExt.Lang.set(OpenLayers.Util.getParameters()["locale"] || GeoExt.Lang.locale);
                 }
                 Ext.create(GeoExplorer.Composer, {
+                    queryText: "Query",
+                    layersText: "Layers",
                     authStatus: {{status}},
                     proxy: "../proxy/?url=",
                     printService: "/geoserver/pdf/",
