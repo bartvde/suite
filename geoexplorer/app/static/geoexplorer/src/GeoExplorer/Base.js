@@ -1,5 +1,6 @@
 /**
  * @requires Viewer.js
+ * @requires GeoExplorer/plugins/About.js
  */
 
 Ext.USE_NATIVE_JSON = true;
@@ -112,7 +113,7 @@ Ext.define('GeoExplorer.Base', {
         }*/, {
             hidden: true, actions: ["->"], checked: true
         }, {
-            hidden: true, actions: ["aboutbutton"], checked: true
+            hidden: true, ptype: "geoexplorer_about", showButtonText: false, checked: true
         }];
         this.callParent(arguments);
     },

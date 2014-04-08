@@ -6,35 +6,44 @@
     <!-- PrintPreview resources -->
     <link rel="stylesheet" type="text/css" href="../externals/PrintPreview/resources/css/printpreview.css">
 
+    <style type="text/css">
+        .x-btn .icon-geoexplorer {
+            background-image: url(../theme/app/img/silk/help.png);
+        }
+    </style>
     <script>
-        Ext.BLANK_IMAGE_URL = "../theme/app/img/blank.gif";
-        OpenLayers.ImgPath = "../theme/app/img/";
-        var app = new GeoExplorer.Viewer({
-            proxy: "../proxy/?url=",
-            printService: "/geoserver/pdf/",
-            about: {
-                title: "GeoExplorer Demo Map",
-                "abstract": "This is a demonstration of GeoExplorer, " +
-                    "an application for assembling and publishing web " +
-                    "based maps.",
-                contact: "For more information, contact <a href='http://boundlessgeo.com'>Boundless</a>."
-            },
-            defaultSourceType: "gxp_wmscsource",
-            sources: {
-                suite: {
-                    url: "http://v2.suite.opengeo.org/geoserver/ows"
-                }
-            },
-            map: {
-                layers: [{
-                    name: "world",
-                    title: "World",
-                    source: "suite",
-                    group: "background"
-                }],
-                center: [0, 0],
-                zoom: 2
+        Ext.application({
+            name: 'Viewer',
+            launch: function() {
+                Ext.BLANK_IMAGE_URL = "../theme/app/img/blank.gif";
+                OpenLayers.ImgPath = "../theme/app/img/";
+                Ext.create('GeoExplorer.Viewer', {
+                    proxy: "../proxy/?url=",
+                    printService: "/geoserver/pdf/",
+                    about: {
+                        title: "GeoExplorer Demo Map",
+                        "abstract": "This is a demonstration of GeoExplorer, " +
+                            "an application for assembling and publishing web " +
+                            "based maps.",
+                        contact: "For more information, contact <a href='http://boundlessgeo.com'>Boundless</a>."
+                    },
+                    defaultSourceType: "gxp_wmscsource",
+                    sources: {
+                        suite: {
+                            url: "http://v2.suite.opengeo.org/geoserver/ows"
+                        }
+                    },
+                    map: {
+                        layers: [{
+                            name: "world",
+                            title: "World",
+                            source: "suite",
+                            group: "background"
+                        }],
+                        center: [0, 0],
+                        zoom: 2
+                    }
+                });
             }
         });
     </script>
-    

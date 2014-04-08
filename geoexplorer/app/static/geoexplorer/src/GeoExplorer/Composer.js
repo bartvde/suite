@@ -86,13 +86,9 @@ Ext.define('GeoExplorer.Composer', {
         }, {
             ptype: "gxp_zoomtoextent"
         }, {
-            actions: [{
-                id: "aboutbutton",
-                text: this.appInfoText,
-                iconCls: "icon-geoexplorer",
-                handler: this.displayAppInfo,
-                scope: this
-            }], showButtonText: true, actionTarget: "paneltbar"
+            ptype: "geoexplorer_about",
+            showButtonText: true,
+            actionTarget: "paneltbar"
         }, {
             actions: ["-"], actionTarget: "paneltbar"
         }, {

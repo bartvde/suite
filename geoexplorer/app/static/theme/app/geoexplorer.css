@@ -40,10 +40,6 @@ body {
     background-image: url(img/geoexplorer.png);
 }
 
-.x-btn .icon-about {
-    background-image: url(img/silk/help.png);
-}
-
 .x-btn .icon-addlayers {
     background-image: url(img/silk/add.png);
 }
