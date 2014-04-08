@@ -130,7 +130,7 @@ Ext.define('GeoExplorer.Composer', {
             actions: ["-"],
             actionTarget: "paneltbar"
         }, {
-            ptype: "gxp_wmsgetfeatureinfo", format: 'html', /* TODO restore back to grid */
+            ptype: "gxp_wmsgetfeatureinfo", format: 'grid',
             toggleGroup: "interaction",
             showButtonText: true,
             actionTarget: "paneltbar"
