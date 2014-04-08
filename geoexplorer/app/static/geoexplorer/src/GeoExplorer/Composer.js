@@ -471,6 +471,17 @@ Ext.define('GeoExplorer.Composer', {
     showEmbedWindow: function() {
        var toolsArea = Ext.create('Ext.tree.TreePanel', {title: this.toolsTitle,
            autoScroll: true,
+           listeners: {
+               'checkchange': function(record) {
+                   for (var i=0, ii=this.viewerTools.length; i<ii; ++i) {
+                       if (this.viewerTools[i].text == record.get('text')) {
+                           this.viewerTools[i].checked = record.get('checked');
+                           break;
+                       }
+                   }
+               },
+               scope: this
+           },
            store: Ext.create('Ext.data.TreeStore', {
                root: {
                    expanded: true,
