@@ -1,9 +1,11 @@
 /**
  * @requires GeoExplorer/Base.js
+ * @requires container/EmbedMapDialog.js
  */
 
 Ext.define('GeoExplorer.Composer', {
     extend: 'GeoExplorer.Base',
+    requires: ['Ext.tree.TreePanel', 'gxp.container.EmbedMapDialog'],
     cookieParamName: 'geoexplorer-user',
     mapText: "Map",
     saveMapText: "Save map",
@@ -462,18 +464,19 @@ Ext.define('GeoExplorer.Composer', {
         preview.show();
         var body = preview.items.get(0).body;
         var iframe = body.dom.firstChild;
-        var loading = new Ext.LoadMask(body);
+        var loading = Ext.create('Ext.LoadMask', {target: body});
         loading.show();
         Ext.get(iframe).on('load', function() { loading.hide(); });
     },
     showEmbedWindow: function() {
-       var toolsArea = new Ext.tree.TreePanel({title: this.toolsTitle,
+       var toolsArea = Ext.create('Ext.tree.TreePanel', {title: this.toolsTitle,
            autoScroll: true,
-           root: {
-               nodeType: 'async',
-               expanded: true,
-               children: this.viewerTools
-           },
+           store: Ext.create('Ext.data.TreeStore', {
+               root: {
+                   expanded: true,
+                   children: this.viewerTools
+               }
+           }),
            rootVisible: false,
            id: 'geobuilder-0'
        });
@@ -490,7 +493,7 @@ Ext.define('GeoExplorer.Composer', {
            }
        };
 
-       var embedMap = new gxp.EmbedMapDialog({
+       var embedMap = Ext.create('gxp.container.EmbedMapDialog', {
            id: 'geobuilder-1',
            url: "../viewer/#maps/" + this.id
        });
@@ -505,19 +508,19 @@ Ext.define('GeoExplorer.Composer', {
                id: 'preview',
                text: this.previewText,
                handler: function() {
-                   this.save(this.openPreview.createDelegate(this, [embedMap]));
+                   this.save(Ext.bind(this.openPreview, this, [embedMap]));
                },
                scope: this
            }, '->', {
                id: 'wizard-prev',
                text: this.backText,
-               handler: previousNext.createDelegate(this, [-1]),
+               handler: Ext.bind(previousNext, this, [-1]),
                scope: this,
                disabled: true
            },{
                id: 'wizard-next',
                text: this.nextText,
-               handler: previousNext.createDelegate(this, [1]),
+               handler: Ext.bind(previousNext, this, [1]),
                scope: this
            }],
            items: [toolsArea, embedMap]

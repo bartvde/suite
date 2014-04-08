@@ -8,6 +8,7 @@ Ext.define('GeoExplorer.Viewer', {
     applyConfig: function(config) {
         var allTools = config.viewerTools || this.viewerTools;
         var tools = [];
+        tools.push({ptype: "geoexplorer_layerchooser", actionTarget: "paneltbar"}, {actions: ["-"], actionTarget: "paneltbar"});
         var toolConfig;
         for (var i=0, len=allTools.length; i<len; i++) {
             var tool = allTools[i];
@@ -22,6 +23,7 @@ Ext.define('GeoExplorer.Viewer', {
                 tools.push(toolConfig);
             }
         }
+        tools.push({actions: ["->"], actionTarget: "paneltbar"}, {ptype: "geoexplorer_about", showButtonText: false, actionTarget: "paneltbar"});
         config.tools = tools;
         this.callParent(arguments);
     },

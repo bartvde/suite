@@ -46,11 +46,8 @@ Ext.define('GeoExplorer.Base', {
         // both the Composer and the Viewer need to know about the viewerTools
         // First row in each object is needed to correctly render a tool in the treeview
         // of the embed map dialog. TODO: make this more flexible so this is not needed.
-        config.viewerTools = [{
-            hidden: true, ptype: "geoexplorer_layerchooser", checked: true
-        }, {
-            hidden: true, actions: ["-"], checked: true
-        }/*, {
+        config.viewerTools = [
+        /*{
             leaf: true,
             text: gxp.plugins.Print.prototype.tooltip,
             ptype: "gxp_print",
@@ -58,7 +55,7 @@ Ext.define('GeoExplorer.Base', {
             customParams: {outputFilename: 'GeoExplorer-print'},
             printService: config.printService,
             checked: true
-        }*/, {
+        }, */ {
             leaf: true,
             text: gxp.plugins.Navigation.prototype.tooltip,
             checked: true,
@@ -111,11 +108,8 @@ Ext.define('GeoExplorer.Base', {
             checked: true,
             iconCls: "gxp-icon-googleearth",
             ptype: "gxp_googleearth"
-        }*/, {
-            hidden: true, actions: ["->"], checked: true
-        }, {
-            hidden: true, ptype: "geoexplorer_about", showButtonText: false, checked: true
-        }];
+        }*/
+        ];
         this.callParent(arguments);
     },
     loadConfig: function(config) {
