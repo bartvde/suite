@@ -4,6 +4,7 @@
 
 Ext.define('GeoExplorer.Viewer', {
     extend: 'GeoExplorer.Base',
+    requires: ['gxp.menu.Layer'],
     applyConfig: function(config) {
         var allTools = config.viewerTools || this.viewerTools;
         var tools = [];

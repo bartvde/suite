@@ -1,6 +1,7 @@
 /**
  * @requires Viewer.js
  * @requires GeoExplorer/plugins/About.js
+ * @requires GeoExplorer/plugins/LayerChooser.js
  */
 
 Ext.USE_NATIVE_JSON = true;
@@ -46,7 +47,7 @@ Ext.define('GeoExplorer.Base', {
         // First row in each object is needed to correctly render a tool in the treeview
         // of the embed map dialog. TODO: make this more flexible so this is not needed.
         config.viewerTools = [{
-            hidden: true, actions: ["layerchooser"], checked: true
+            hidden: true, ptype: "geoexplorer_layerchooser", checked: true
         }, {
             hidden: true, actions: ["-"], checked: true
         }/*, {
