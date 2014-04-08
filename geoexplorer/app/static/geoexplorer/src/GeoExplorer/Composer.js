@@ -4,6 +4,7 @@
 
 Ext.define('GeoExplorer.Composer', {
     extend: 'gxp.Viewer',
+    cookieParamName: 'geoexplorer-user',
     zoomSliderText: "<div>Zoom Level: {zoom}</div><div>Scale: 1:{scale}</div>",
     loadConfigErrorText: "Trouble reading saved configuration: <br />",
     loadConfigErrorDefaultText: "Server Error.",
@@ -37,6 +38,17 @@ Ext.define('GeoExplorer.Composer', {
     logoutConfirmTitle: "Warning",
     logoutConfirmMessage: "Logging out will undo any unsaved changes, remove any layers you may have added, and reset the map composition. Do you want to save your composition first?",
     constructor: function(config) {
+        // Starting with this.authorizedRoles being undefined, which means no
+        // authentication service is available
+        if (config.authStatus === 401) {
+            // user has not authenticated or is not authorized
+            this.authorizedRoles = [];
+        } else if (config.authStatus !== 404) {
+            // user has authenticated
+            this.authorizedRoles = ["ROLE_ADMINISTRATOR"];
+        }
+        // should not be persisted or accessed again
+        delete config.authStatus;
         this.mapItems = [{
             xtype: "gxp_scaleoverlay"
         }, {
@@ -210,10 +222,26 @@ Ext.define('GeoExplorer.Composer', {
             actions: ["->"],
             actionTarget: "paneltbar"
         }, {
-            actions: ["loginbutton"],
-            actionTarget: "paneltbar"
+            actions: [{id: "loginbutton"}],
+            actionTarget: "paneltbar", showButtonText: true
         }];
         this.callParent(arguments);
+    },
+    applyLoginState: function(iconCls, text, handler, scope) {
+        var loginButton = Ext.getCmp("loginbutton");
+        loginButton.setIconCls(iconCls);
+        loginButton.setText(text);
+        loginButton.setHandler(handler, scope);
+    },
+    showLogin: function() {
+        var text = this.loginText;
+        var handler = this.authenticate;
+        this.applyLoginState('login', text, handler, this);
+    },
+    showLogout: function(user) {
+        var text = new Ext.Template(this.logoutText).applyTemplate({user: user});
+        var handler = this.logout;
+        this.applyLoginState('logout', text, handler, this);
     },
     displayAppInfo: function() {
         var appInfo = Ext.create('Ext.Panel', {
@@ -321,6 +349,155 @@ Ext.define('GeoExplorer.Composer', {
             ]
         }];
         this.callParent(arguments);
-    }
+        if (this.authorizedRoles) {
+            // unauthorized, show login button
+            if (this.authorizedRoles.length === 0) {
+                this.showLogin();
+            } else {
+                var user = this.getCookieValue(this.cookieParamName);
+                if (user === null) {
+                    user = "unknown";
+                }
+                this.showLogout(user);
+            }
+        }
+    },
+    setCookieValue: function(param, value) {
+        document.cookie = param + '=' + escape(value);
+    },
+    clearCookieValue: function(param) {
+        document.cookie = param + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    },
+    getCookieValue: function(param) {
+        var i, x, y, cookies = document.cookie.split(";");
+        for (i=0; i < cookies.length; i++) {
+            x = cookies[i].substr(0, cookies[i].indexOf("="));
+            y = cookies[i].substr(cookies[i].indexOf("=")+1);
+            x=x.replace(/^\s+|\s+$/g,"");
+            if (x==param) {
+                return unescape(y);
+            }
+        }
+        return null;
+    },
+    authenticate: function() {
+        var panel = Ext.create('Ext.form.FormPanel', {
+            url: "../login/",
+            frame: true,
+            labelWidth: 60,
+            // TODO restore errorReader
+            /*errorReader: {
+                read: function(response) {
+                    var success = false;
+                    var records = [];
+                    if (response.status === 200) {
+                        success = true;
+                    } else {
+                        records = [
+                            {data: {id: "username", msg: this.loginErrorText}},
+                            {data: {id: "password", msg: this.loginErrorText}}
+                        ];
+                    }
+                    return {
+                        success: success,
+                        records: records
+                    };
+                }
+            },*/
+            items: [{
+                fieldLabel: this.userFieldText,
+                name: "username",
+                xtype: 'textfield',
+                allowBlank: false,
+                listeners: {
+                    render: function() {
+                        this.focus(true, 100);
+                    }
+                }
+            }, {
+                fieldLabel: this.passwordFieldText,
+                name: "password",
+                xtype: 'textfield',
+                inputType: "password",
+                allowBlank: false
+            }],
+            buttons: [{
+                text: this.loginText,
+                formBind: true,
+                handler: submitLogin,
+                scope: this
+            }],
+            keys: [{
+                key: [Ext.EventObject.ENTER],
+                handler: submitLogin,
+                scope: this
+            }]
+        });
 
+        function submitLogin() {
+            panel.down('button').disable();
+            panel.getForm().submit({
+                success: function(form, action) {
+                    Ext.getCmp('paneltbar').items.each(function(tool) {
+                        if (tool.needsAuthorization === true) {
+                            tool.enable();
+                        }
+                    });
+                    var user = form.findField('username').getValue();
+                    this.setCookieValue(this.cookieParamName, user);
+                    this.setAuthorizedRoles(["ROLE_ADMINISTRATOR"]);
+                    this.showLogout(user);
+                    win.un("beforedestroy", this.cancelAuthentication, this);
+                    win.close();
+                },
+                failure: function(form, action) {
+                    this.authorizedRoles = [];
+                    panel.buttons[0].enable();
+                    form.markInvalid({
+                        "username": this.loginErrorText,
+                        "password": this.loginErrorText
+                    });
+                },
+                scope: this
+            });
+        }
+
+        var win = Ext.create('Ext.window.Window', {
+            title: this.loginText,
+            layout: "fit",
+            width: 235,
+            height: 130,
+            plain: true,
+            border: false,
+            modal: true,
+            items: [panel],
+            listeners: {
+                beforedestroy: this.cancelAuthentication,
+                scope: this
+            }
+        });
+        win.show();
+    },
+    logout: function() {
+        var callback = function() {
+            this.clearCookieValue("JSESSIONID");
+            this.clearCookieValue(this.cookieParamName);
+            this.setAuthorizedRoles([]);
+            window.location.reload();
+        };
+        Ext.Msg.show({
+            title: this.logoutConfirmTitle,
+            msg: this.logoutConfirmMessage,
+            buttons: Ext.Msg.YESNOCANCEL,
+            icon: Ext.MessageBox.WARNING,
+            fn: function(btn) {
+                if (btn === 'yes') {
+                    this.save(callback, this);
+                } else if (btn === 'no') {
+                    callback.call(this);
+                }
+            },
+            scope: this
+        });
+    }
 });
