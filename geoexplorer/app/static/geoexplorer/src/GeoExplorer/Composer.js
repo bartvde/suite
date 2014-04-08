@@ -463,7 +463,7 @@ Ext.define('GeoExplorer.Composer', {
         });
         preview.show();
         var body = preview.items.get(0).body;
-        var iframe = body.dom.firstChild;
+        var iframe = body.down('iframe');
         var loading = Ext.create('Ext.LoadMask', {target: body});
         loading.show();
         Ext.get(iframe).on('load', function() { loading.hide(); });
