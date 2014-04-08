@@ -9,7 +9,7 @@ Ext.define('GeoExplorer.Composer', {
     cookieParamName: 'geoexplorer-user',
     mapText: "Map",
     saveMapText: "Save map",
-    exportMapText: "Export map",
+    exportMapText: "Publish map",
     toolsTitle: "Choose tools to include in the toolbar:",
     previewText: "Preview",
     backText: "Back",
