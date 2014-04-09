@@ -419,8 +419,6 @@ Ext.define('GeoExplorer.Composer', {
         var win = Ext.create('Ext.window.Window', {
             title: this.loginText,
             layout: "fit",
-            width: 235,
-            height: 130,
             plain: true,
             border: false,
             modal: true,
