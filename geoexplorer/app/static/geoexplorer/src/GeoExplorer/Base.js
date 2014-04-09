@@ -33,6 +33,9 @@ Ext.define('GeoExplorer.Base', {
             xtype: "gx_zoomslider",
             vertical: true,
             height: 100,
+            maxHeight: 100,
+            width: 15,
+            region: 'west',
             plugins: Ext.create('GeoExt.slider.Tip', {
                 getText: function(thumb) {
                      return Ext.String.format(
