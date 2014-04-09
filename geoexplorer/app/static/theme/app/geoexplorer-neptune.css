@@ -1,0 +1,8 @@
+.x-tab-default-active .x-tab-inner {
+    color: white;
+}
+.gxp-crumb-separator {
+    height: 18px;
+    font-size: 18px !important;
+    top: 8px;
+}
