@@ -96,16 +96,13 @@
                                     <fileset dir="app/static/externals/openlayers/theme"/>
                                 </copy>
                                 <!-- copy GeoExt resources -->
-                                <copy todir="${war-src}/WEB-INF/app/static/externals/geoext/resources">
-                                    <fileset dir="app/static/externals/geoext/resources">
-                                        <exclude name="**/geoext-all-debug.css"/>
-                                        <exclude name="**/gxtheme-slate.css"/>
-                                        <exclude name="**/slate/**"/>
+                                <copy todir="${war-src}/WEB-INF/app/static/externals/geoext2/resources">
+                                    <fileset dir="app/static/externals/geoext2/resources">
                                     </fileset>
                                 </copy>
                                 <!-- copy gxp resources -->
-                                <copy todir="${war-src}/WEB-INF/app/static/externals/gxp/src/theme">
-                                    <fileset dir="app/static/externals/gxp/src/theme"/>
+                                <copy todir="${war-src}/WEB-INF/app/static/externals/gxp2/resources">
+                                    <fileset dir="app/static/externals/gxp2/resources"/>
                                 </copy>
                                 <!-- copy PrintPreview resources -->
                                 <copy todir="${war-src}/WEB-INF/app/static/externals/printpreview/resources">
