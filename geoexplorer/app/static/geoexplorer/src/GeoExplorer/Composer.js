@@ -65,13 +65,13 @@ Ext.define('GeoExplorer.Composer', {
             outputConfig: {defaults: {autoScroll: true}, width: 320},
             actionTarget: ["layers.tbar", "layers.contextMenu"],
             outputTarget: "tree"
-        }/*, {
+        }, {
             ptype: "gxp_styler",
             id: "styler",
             outputConfig: {autoScroll: true, width: 320},
             actionTarget: ["layers.tbar", "layers.contextMenu"],
             outputTarget: "tree"
-        }*/, {
+        }/*, {
             ptype: "gxp_zoomtolayerextent",
             actionTarget: {target: "layers.contextMenu", index: 0}
         }/*, {
