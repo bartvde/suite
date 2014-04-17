@@ -1,6 +1,35 @@
 /**
  * @requires GeoExplorer/Base.js
  * @requires container/EmbedMapDialog.js
+ * @requires plugins/FeatureManager.js
+ * @requires GeoExt/slider/Zoom.js
+ * @requires GeoExt/slider/Tip.js
+ * @requires Viewer.js
+ * @requires ColorManager.js
+ * @requires panel/ScaleOverlay.js
+ * @requires plugins/LayerTree.js
+ * @requires plugins/Styler.js
+ * @requires plugins/AddLayers.js
+ * @requires plugins/RemoveLayer.js
+ * @requires plugins/LayerProperties.js
+ * @requires plugins/ZoomToLayerExtent.js
+ * @requires plugins/Navigation.js
+ * @requires plugins/Zoom.js
+ * @requires plugins/NavigationHistory.js
+ * @requires plugins/WMSGetFeatureInfo.js
+ * @requires plugins/QueryForm.js
+ * @requires plugins/FeatureGrid.js
+ * @requires plugins/Measure.js
+ * @requires plugins/WMSCSource.js
+ * @requires plugins/CSWCatalogueSource.js
+ * @requires plugins/MapQuestSource.js
+ * @requires plugins/OSMSource.js
+ * @requires plugins/GoogleSource.js
+ * @requires plugins/BingSource.js
+ * @requires plugins/MapBoxSource.js
+ * @requires plugins/OLSource.js
+ * @requires plugins/FeatureEditor.js
+ * @requires tab/CrumbPanel.js
  */
 
 Ext.define('GeoExplorer.Composer', {
