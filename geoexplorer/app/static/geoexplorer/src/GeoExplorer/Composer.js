@@ -176,7 +176,7 @@ Ext.define('GeoExplorer.Composer', {
             id: "featuremanager",
             maxFeatures: 20,
             paging: false
-        }/*, {
+        }, {
             ptype: "gxp_featureeditor",
             featureManager: "featuremanager",
             autoLoadFeature: true,
@@ -184,7 +184,7 @@ Ext.define('GeoExplorer.Composer', {
             showButtonText: true,
             toggleGroup: "interaction",
             actionTarget: "paneltbar"
-        }*/, {
+        }, {
             actions: ["->"],
             actionTarget: "paneltbar"
         }, {
