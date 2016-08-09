@@ -42,14 +42,8 @@
                     url: "http://v2.suite.opengeo.org/geoserver/ows",
                     title: "Remote Suite GeoServer"
                 },
-                mapquest: {
-                    ptype: "gxp_mapquestsource"
-                },
                 osm: {
                     ptype: "gxp_osmsource"
-                },
-                google: {
-                    ptype: "gxp_googlesource"
                 },
                 bing: {
                     ptype: "gxp_bingsource"
@@ -65,9 +59,9 @@
             map: {
                 projection: "EPSG:102113",
                 layers: [{
-                    source: "mapquest",
-                    title: "MapQuest OpenStreetMap",
-                    name: "osm",
+                    source: "osm",
+                    title: "OpenStreetMap",
+                    name: "mapnik",
                     group: "background"
                 }, {
                     source: "ol",
